@@ -1,6 +1,6 @@
 {
     "name": "@pencil.js/image-manipulation",
-    "version": "0.0.0",
+    "version": "0.1.0",
     "description": "Pencil.js plugin to edit images",
     "main": "src/index.js",
     "publishConfig": {
