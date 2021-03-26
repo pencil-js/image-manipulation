@@ -3,6 +3,9 @@
     "version": "0.0.0",
     "description": "Pencil.js plugin to edit images",
     "main": "src/index.js",
+    "publishConfig": {
+        "access": "public"
+    },
     "scripts": {
         "test": "ava"
     },
@@ -20,11 +23,11 @@
     },
     "homepage": "https://github.com/pencil-js/image-manipulation#readme",
     "peerDependencies": {
-        "pencil.js": "^2.1.0"
+        "pencil.js": ">=2"
     },
     "devDependencies": {
         "@gmartigny/eslint-config": "^1.6.0",
         "eslint": "^7.22.0",
-        "pencil.js": "*"
+        "pencil.js": "^2.1.0"
     }
 }
