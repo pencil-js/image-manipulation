@@ -1,0 +1,30 @@
+{
+    "name": "@pencil.js/image-manipulation",
+    "version": "0.0.0",
+    "description": "Pencil.js plugin to edit images",
+    "main": "src/index.js",
+    "scripts": {
+        "test": "ava"
+    },
+    "eslintConfig": {
+        "extends": "@gmartigny/eslint-config"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/pencil-js/image-manipulation.git"
+    },
+    "author": "GMartigny",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/pencil-js/image-manipulation/issues"
+    },
+    "homepage": "https://github.com/pencil-js/image-manipulation#readme",
+    "peerDependencies": {
+        "pencil.js": "^2.1.0"
+    },
+    "devDependencies": {
+        "@gmartigny/eslint-config": "^1.6.0",
+        "eslint": "^7.22.0",
+        "pencil.js": "*"
+    }
+}
