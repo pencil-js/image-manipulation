@@ -2,7 +2,17 @@
     "name": "@pencil.js/image-manipulation",
     "version": "0.1.1",
     "description": "Pencil.js plugin to edit images",
+    "keywords": [
+        "pencil.js",
+        "plugin",
+        "image",
+        "pixel"
+    ],
     "main": "src/index.js",
+    "module": "./src/index.js",
+    "exports": {
+        "import": "./src/index.js"
+    },
     "files": [
         "src"
     ],

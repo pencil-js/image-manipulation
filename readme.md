@@ -33,6 +33,9 @@ const image = new Image(position, url);
 ```
 
 
+## [Documentation](documentation.md)
+
+
 ## License
 
 [MIT](license)
