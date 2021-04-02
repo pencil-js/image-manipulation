@@ -1,6 +1,16 @@
 export default ({ OffScreenCanvas, Color, Image }) => {
     const sandbox = OffScreenCanvas.getDrawingContext();
 
+    function draw (image) {
+        sandbox.canvas.width = image.width;
+        sandbox.canvas.height = image.height;
+        image.draw(sandbox);
+    }
+
+    async function loadDataUrl (image) {
+        image.file = await Image.load(sandbox.canvas.toDataURL());
+    }
+
     /**
      * @callback EachPixelCallback
      * @param {Color} color - Color of the pixel
@@ -16,9 +26,7 @@ export default ({ OffScreenCanvas, Color, Image }) => {
             return this;
         }
 
-        sandbox.canvas.width = this.width;
-        sandbox.canvas.height = this.height;
-        this.draw(sandbox);
+        draw(this);
 
         const imageData = sandbox.getImageData(0, 0, this.width, this.height);
         const { data } = imageData;
@@ -31,7 +39,7 @@ export default ({ OffScreenCanvas, Color, Image }) => {
         }
         sandbox.putImageData(imageData, 0, 0);
 
-        this.file = await Image.load(sandbox.canvas.toDataURL());
+        await loadDataUrl(this);
         return this;
     }
 
@@ -45,15 +53,14 @@ export default ({ OffScreenCanvas, Color, Image }) => {
             return this;
         }
 
-        sandbox.canvas.width = this.width;
-        sandbox.canvas.height = this.height;
-        this.draw(sandbox);
+        draw(this);
 
         image.forEach((one) => {
             if (one.isLoaded) {
                 sandbox.save();
                 sandbox.translate(one.position.x, one.position.y);
                 one.setContext(sandbox);
+                one.constructor.setOpacity(sandbox, one.options.opacity);
                 const origin = one.getOrigin();
                 sandbox.translate(origin.x, origin.y);
                 one.draw(sandbox);
@@ -61,76 +68,35 @@ export default ({ OffScreenCanvas, Color, Image }) => {
             }
         });
 
-        this.file = await Image.load(sandbox.canvas.toDataURL());
+        await loadDataUrl(this);
         return this;
     }
 
-    const funcMap = new Map();
-    const actionToFunc = {};
-
     /**
-     * Prepare a function to execute on each pixels
-     * @param {String} action - Name of this function for storage
-     * @return {function(...[*]=): Promise<Image>}
-     */
-    function getFunction (action) {
-        /**
-         * Function that run on each pixel
-         * @param {...*} [params] - Additional parameters
-         * @return {Promise<Image>}
-         */
-        function fn (...params) {
-            return this.eachPixel(funcMap.get(actionToFunc[action])(...params));
-        }
-        Object.defineProperty(fn, "name", {
-            value: action,
-            writable: false,
-            enumerable: false,
-            configurable: true,
-        });
-        actionToFunc[action] = fn;
-        return fn;
-    }
-
-    const grey = getFunction("grey");
-    const reverse = getFunction("reverse");
-    const level = getFunction("level");
-    const colorize = getFunction("colorize");
-    const saturate = getFunction("saturation");
-    const rotate = getFunction("rotate");
-    const lighten = getFunction("lighten");
-
-    funcMap.set(grey, () => pixel => pixel.grey());
-    funcMap.set(reverse, () => pixel => pixel.reverse());
-    funcMap.set(level, number => pixel => pixel.level(number));
-    funcMap.set(colorize, (color, ratio) => pixel => pixel.lerp(color, ratio));
-    funcMap.set(saturate, value => pixel => pixel.saturation(value));
-    funcMap.set(rotate, value => pixel => pixel.hue(value));
-    funcMap.set(lighten, value => pixel => pixel.lightness(value));
-
-    /**
-     * Run multiple pixel transformation in parallel
-     * @param {...Function|Array<Function, *>} transform - Function to execute on each pixel, you can pass argument to this function by wrapping it in an array
+     * Add a color on top of the image
+     * @param {Color|String} color - Pencil.js Color instance or valid CSS color string
+     * @param {Image} ratio - Number between 0 and 1
      * @return {Promise<Image>} Itself when done
-     * @example image.batch(image.grey, [image.colorize, "red", 0.5]);
      */
-    function batch (...transform) {
-        const functions = transform.map(func => (Array.isArray(func) ?
-            funcMap.get(func[0])(...func.slice(1)) :
-            funcMap.get(func)()));
-        return this.eachPixel(pixel => functions.reduce((pix, func) => func(pix), pixel));
+    async function colorize (color, ratio = 1) {
+        if (!this.isLoaded) {
+            return this;
+        }
+
+        draw(this);
+
+        sandbox.globalCompositeOperation = "multiply";
+        sandbox.globalAlpha = ratio;
+        sandbox.fillStyle = color.toString();
+        sandbox.fillRect(0, 0, this.width, this.height);
+
+        await loadDataUrl(this);
+        return this;
     }
 
     return {
         eachPixel,
-        batch,
-        grey,
-        reverse,
-        level,
-        colorize,
-        saturate,
-        rotate,
-        lighten,
         merge,
+        colorize,
     };
 };

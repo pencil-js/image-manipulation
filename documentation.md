@@ -2,17 +2,6 @@
 
 ## Methods
 
-## Shorthands
-
-- `.grey()`
-- `.reverse()`
-- `.level(<Number>)`
-- `.colorize(<Color> targetColor, <Number> ratioToColor)`
-- `.saturate(<Number>saturationValue)`
-- `.rotate(<Number>hueValue)`
-- `.lighten(<Number>lightnessValue)`
-
-
 ### `.eachPixel`
 
 Browse each pixel on the image and apply some transformation
@@ -27,22 +16,32 @@ await image.eachPixel((pixelColor, index) => {
     console.log(index); // => {Number} current pixel index (from left to right, top to bottom)
     pixelColor
         .grey()
-        .lerp("red", 0.5);
+        .saturation(1);
 });
 ```
 
+### `.merge`
 
-### `.batch`
-
-Run multiple pixel transformation in parallel.
+Merge multiple image on top of each other
 
 | Name | Type | Default | Comment |
 | ---- | ---- | ------- | ------- |
-|transform |`Function` or `[Function, ...*]` |- |Function to execute on each pixel, you can pass argument to this function by wrapping it in an array |
+|image |`...Image` |- |Another image to paint on top |
 
 ```js
-await image.batch(
-    image.grey,
-    [image.colorize, "red", 0.5],
-);
+await image.merge(layer1, layer2, layer3);
+```
+
+
+### `.colorize`
+
+Add a color on top of the image
+
+| Name | Type | Default | Comment |
+| ---- | ---- | ------- | ------- |
+|color |`Color` ou `String` |- |Pencil.js Color instance or valid CSS color string |
+|ratio |`Number` |`1` |Number between 0 and 1 |
+
+```js
+await image.colorize("red", 0.5);
 ```

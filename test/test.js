@@ -16,11 +16,14 @@ const img = new Image([40, 10], "cat.png", {
 img.on("ready", async () => {
     const time = "Edit";
     console.time(time);
-    await img.batch(
-        [img.colorize, "#0da000", 0.5],
-        [img.saturate, 2],
-        img.reverse,
-    );
+    const over = new Image([img.width / 2, img.height / 2], img.file, {
+        origin: "center",
+        scale: [-0.5, 0.5],
+        opacity: 0.7,
+    });
+    await img.colorize("red", 0.6);
+    await over.eachPixel(pixel => pixel.grey());
+    await img.merge(over);
     console.timeEnd(time);
     scene
         .add(img)
